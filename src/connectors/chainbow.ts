@@ -38,20 +38,21 @@ export namespace ChainBowWalletTypes {
 
   export type Network = 'BTClivenet' | 'BTCtestnet';
 }
+export type PsbtOption = {
+  autoFinalized?: boolean;
+  toSignInputs: {
+    index: number;
+    address?: string;
+    publicKey?: string;
+    sighashTypes?: number[];
+    disableTweakSigner?: boolean;
+  }[];
+};
 export type ChainBow = {
   requestAccounts: () => Promise<string[]>;
   getAccounts: () => Promise<string[]>;
   on: ChainBowWalletTypes.AccountsChangedEvent;
   removeListener: ChainBowWalletTypes.AccountsChangedEvent;
-  getInscriptions: (
-    cursor: number,
-    size: number,
-  ) => Promise<ChainBowWalletTypes.GetInscriptionsResult>;
-  sendInscription: (
-    address: string,
-    inscriptionId: string,
-    options?: { feeRate: number },
-  ) => Promise<ChainBowWalletTypes.SendInscriptionsResult>;
   switchNetwork: (network: 'BTClivenet' | 'BTCtestnet') => Promise<void>;
   getNetwork: () => Promise<ChainBowWalletTypes.Network>;
   getPublicKey: () => Promise<string>;
@@ -67,33 +68,9 @@ export type ChainBow = {
     message: string,
     type?: 'ecdsa' | 'bip322-simple',
   ) => Promise<string>;
-  signPsbt: (
-    psbtHex: string,
-    options?: {
-      autoFinalized?: boolean;
-      toSignInputs: {
-        index: number;
-        address?: string;
-        publicKey?: string;
-        sighashTypes?: number[];
-        disableTweakSigner?: boolean;
-      }[];
-    },
-  ) => Promise<string>;
-
-  signPsbts: (
-    psbtHexs: string[],
-    options?: {
-      autoFinalized?: boolean;
-      toSignInputs: {
-        index: number;
-        address?: string;
-        publicKey?: string;
-        sighashTypes?: number[];
-        disableTweakSigner?: boolean;
-      };
-    }[],
-  ) => Promise<string[]>;
+  signPsbt: (psbtHex: string, options?: PsbtOption) => Promise<string>;
+  finishPsbt: (psbtHex: string, options?: PsbtOption) => Promise<string>;
+  signPsbts: (psbtHexs: string[], options?: PsbtOption[]) => Promise<string[]>;
 };
 
 declare global {
@@ -181,9 +158,8 @@ export class ChainBowConnector extends BtcConnector {
     if (!this.chainbow) {
       throw new Error('ChainBow not installed');
     }
-    return this.chainbow?.sendBitcoin(toAddress, amount);
+    return this.chainbow.sendBitcoin(toAddress, amount);
   }
-
   async switchNetwork(network: WalletNetwork) {
     if (!this.chainbow) {
       throw new Error('ChainBow not installed');
@@ -235,5 +211,11 @@ export class ChainBowConnector extends BtcConnector {
       throw new Error('ChainBow not installed');
     }
     return this.chainbow.pushPsbt(psbtHex);
+  }
+  async finishPsbt(psbtHex: string, options?: any) {
+    if (!this.chainbow) {
+      throw new Error('ChainBow not installed');
+    }
+    return this.chainbow.finishPsbt(psbtHex, options);
   }
 }
