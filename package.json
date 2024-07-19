@@ -1,0 +1,68 @@
+{
+  "name": "n20-connect",
+  "author": "NoteScan.io",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.js",
+  "version": "1.0.0",
+  "description": "N20 connect for unisat, notemarket and chainbow",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "btc",
+    "connect",
+    "unisat",
+    "chainbow",
+    "notemarket",
+    "note protocol",
+    "web3",
+    "wallet"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NoteScan/n20-connect"
+  },
+  "scripts": {
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "build": "npm run tailwind && bun build.js",
+    "tailwind": "tailwindcss -i src/style/input.css -o dist/style/index.css --minify",
+    "prepare": "husky",
+    "pre-commit": "lint-staged"
+  },
+  "files": [
+    "dist/**/*"
+  ],
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/web": "^0.0.142",
+    "@typescript-eslint/eslint-plugin": "^7.16.1",
+    "@typescript-eslint/parser": "^7.16.1",
+    "bun-plugin-dts": "^0.2.3",
+    "bun-types": "latest",
+    "eslint": "^8.57.0",
+    "husky": "^9.1.0",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5",
+    "react": "18.3.1",
+    "react-dom": "^18.2.0",
+    "react-select": "^5.8.0",
+    "tailwindcss": "^3.4.1",
+    "yaml": "^2.4.5"
+  },
+  "optionalDependencies": {
+    "@types/react-dom": "^18.3.0",
+    "lint-staged": "^15.2.7",
+    "prettier": "^3.3.3",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.6"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0",
+    "typescript": ">=4.0.0",
+    "zustand": ">=4.0.0"
+  },
+  "dependencies": {
+  }
+}
