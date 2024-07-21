@@ -24,3 +24,14 @@ export type NetworkChangedEvent = (
 
 export type MessageType = 'ecdsa' | 'bip322-simple';
 
+export type PsbtOption = {
+  autoFinalized?: boolean;
+  toSignInputs: {
+    index: number;
+    address?: string;
+    publicKey?: string;
+    sighashTypes?: number[];
+    disableTweakSigner?: boolean;
+  }[];
+};
+  

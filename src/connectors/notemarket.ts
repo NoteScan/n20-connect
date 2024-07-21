@@ -1,5 +1,5 @@
 import { notemarketLogo } from '../assets';
-import { WalletNetwork, Balance } from '../types';
+import { WalletNetwork, Balance, PsbtOption } from '../types';
 import { BtcConnector } from './base';
 
 const getNoteMarketNetwork = (network: WalletNetwork): WalletNetwork => {
@@ -38,20 +38,12 @@ export namespace NoteMarketWalletTypes {
 
   export type Network = 'livenet' | 'testnet';
 }
+
 export type NoteMarket = {
   requestAccounts: () => Promise<string[]>;
   getAccounts: () => Promise<string[]>;
   on: NoteMarketWalletTypes.AccountsChangedEvent;
   removeListener: NoteMarketWalletTypes.AccountsChangedEvent;
-  getInscriptions: (
-    cursor: number,
-    size: number,
-  ) => Promise<NoteMarketWalletTypes.GetInscriptionsResult>;
-  sendInscription: (
-    address: string,
-    inscriptionId: string,
-    options?: { feeRate: number },
-  ) => Promise<NoteMarketWalletTypes.SendInscriptionsResult>;
   switchNetwork: (network: 'livenet' | 'testnet') => Promise<void>;
   getNetwork: () => Promise<NoteMarketWalletTypes.Network>;
   getPublicKey: () => Promise<string>;
@@ -67,33 +59,8 @@ export type NoteMarket = {
     message: string,
     type?: 'ecdsa' | 'bip322-simple',
   ) => Promise<string>;
-  signPsbt: (
-    psbtHex: string,
-    options?: {
-      autoFinalized?: boolean;
-      toSignInputs: {
-        index: number;
-        address?: string;
-        publicKey?: string;
-        sighashTypes?: number[];
-        disableTweakSigner?: boolean;
-      }[];
-    },
-  ) => Promise<string>;
-
-  signPsbts: (
-    psbtHexs: string[],
-    options?: {
-      autoFinalized?: boolean;
-      toSignInputs: {
-        index: number;
-        address?: string;
-        publicKey?: string;
-        sighashTypes?: number[];
-        disableTweakSigner?: boolean;
-      };
-    }[],
-  ) => Promise<string[]>;
+  signPsbt: (psbtHex: string, options?: PsbtOption) => Promise<string>;
+  signPsbts: (psbtHexs: string[], options?: PsbtOption[]) => Promise<string[]>;
 };
 
 declare global {
@@ -218,7 +185,7 @@ export class NoteMarketConnector extends BtcConnector {
     }
     return this.NOTEMarketWallet.signMessage(message);
   }
-  async signPsbts(psbtHexs: string[], options?: any) {
+  async signPsbts(psbtHexs: string[], options?: any[]) {
     if (!this.NOTEMarketWallet) {
       throw new Error('NoteMarket not installed');
     }

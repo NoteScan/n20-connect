@@ -1,5 +1,5 @@
 import { unisatLogo } from '../assets';
-import { WalletNetwork, Balance } from '../types';
+import { WalletNetwork, Balance, PsbtOption } from '../types';
 import { BtcConnector } from './base';
 
 const getUnisatNetwork = (network: WalletNetwork): WalletNetwork => {
@@ -38,20 +38,12 @@ export namespace UnisatWalletTypes {
 
   export type Network = 'livenet' | 'testnet';
 }
+
 export type Unisat = {
   requestAccounts: () => Promise<string[]>;
   getAccounts: () => Promise<string[]>;
   on: UnisatWalletTypes.AccountsChangedEvent;
   removeListener: UnisatWalletTypes.AccountsChangedEvent;
-  getInscriptions: (
-    cursor: number,
-    size: number,
-  ) => Promise<UnisatWalletTypes.GetInscriptionsResult>;
-  sendInscription: (
-    address: string,
-    inscriptionId: string,
-    options?: { feeRate: number },
-  ) => Promise<UnisatWalletTypes.SendInscriptionsResult>;
   switchNetwork: (network: 'livenet' | 'testnet') => Promise<void>;
   getNetwork: () => Promise<UnisatWalletTypes.Network>;
   getPublicKey: () => Promise<string>;
@@ -67,33 +59,8 @@ export type Unisat = {
     message: string,
     type?: 'ecdsa' | 'bip322-simple',
   ) => Promise<string>;
-  signPsbt: (
-    psbtHex: string,
-    options?: {
-      autoFinalized?: boolean;
-      toSignInputs: {
-        index: number;
-        address?: string;
-        publicKey?: string;
-        sighashTypes?: number[];
-        disableTweakSigner?: boolean;
-      }[];
-    },
-  ) => Promise<string>;
-
-  signPsbts: (
-    psbtHexs: string[],
-    options?: {
-      autoFinalized?: boolean;
-      toSignInputs: {
-        index: number;
-        address?: string;
-        publicKey?: string;
-        sighashTypes?: number[];
-        disableTweakSigner?: boolean;
-      };
-    }[],
-  ) => Promise<string[]>;
+  signPsbt: (psbtHex: string, options?: PsbtOption) => Promise<string>;
+  signPsbts: (psbtHexs: string[], options?: PsbtOption[]) => Promise<string[]>;
 };
 
 declare global {
@@ -218,7 +185,7 @@ export class UnisatConnector extends BtcConnector {
     }
     return this.unisat.signMessage(message);
   }
-  async signPsbts(psbtHexs: string[], options?: any) {
+  async signPsbts(psbtHexs: string[], options?: any[]) {
     if (!this.unisat) {
       throw new Error('Unisat not installed');
     }

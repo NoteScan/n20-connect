@@ -1,5 +1,5 @@
 import { chainbowLogo } from '../assets';
-import { WalletNetwork, Balance } from '../types';
+import { WalletNetwork, Balance, PsbtOption } from '../types';
 import { BtcConnector } from './base';
 
 const getChainBowNetwork = (network: WalletNetwork): WalletNetwork => {
@@ -38,16 +38,7 @@ export namespace ChainBowWalletTypes {
 
   export type Network = 'BTClivenet' | 'BTCtestnet';
 }
-export type PsbtOption = {
-  autoFinalized?: boolean;
-  toSignInputs: {
-    index: number;
-    address?: string;
-    publicKey?: string;
-    sighashTypes?: number[];
-    disableTweakSigner?: boolean;
-  }[];
-};
+
 export type ChainBow = {
   requestAccounts: () => Promise<string[]>;
   getAccounts: () => Promise<string[]>;
@@ -194,7 +185,7 @@ export class ChainBowConnector extends BtcConnector {
     }
     return this.chainbow.signMessage(message);
   }
-  async signPsbts(psbtHexs: string[], options?: any) {
+  async signPsbts(psbtHexs: string[], options?: any[]) {
     if (!this.chainbow) {
       throw new Error('ChainBow not installed');
     }

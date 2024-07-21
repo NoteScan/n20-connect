@@ -64,10 +64,10 @@ const wallet = new BtcWalletConnect(walletOptions);
       - `options?`: (Optional) Additional options for signing.
     - **Returns**: A promise that resolves to the signed PSBT in hexadecimal format.
   
-  - **`signPsbts(psbtHexs: string[], options?: any): Promise<string[]>`**: Signs multiple PSBTs.
+  - **`signPsbts(psbtHexs: string[], options?: any[]): Promise<string[]>`**: Signs multiple PSBTs.
     - **Parameters**:
       - `psbtHexs`: An array of PSBTs in hexadecimal format.
-      - `options?`: (Optional) Additional options for the signing process.
+      - `options?`: (Optional) An array of additional options for the signing process.
     - **Returns**: A promise that resolves to an array of signed PSBTs in hexadecimal format.
   
   - **`pushTx(rawTx: string): Promise<string>`**: Broadcasts a raw transaction to the blockchain.

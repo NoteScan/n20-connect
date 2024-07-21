@@ -14,6 +14,16 @@ export interface BtcWalletConnectOptions {
 }
 export type BtcConnectorId = "unisat" | "chainbow" | "notemarket";
 export type MessageType = "ecdsa" | "bip322-simple";
+export type PsbtOption = {
+	autoFinalized?: boolean;
+	toSignInputs: {
+		index: number;
+		address?: string;
+		publicKey?: string;
+		sighashTypes?: number[];
+		disableTweakSigner?: boolean;
+	}[];
+};
 export type Address = string;
 declare abstract class BtcConnector {
 	/** Unique connector id */
@@ -70,10 +80,6 @@ export type Unisat = {
 	getAccounts: () => Promise<string[]>;
 	on: UnisatWalletTypes.AccountsChangedEvent;
 	removeListener: UnisatWalletTypes.AccountsChangedEvent;
-	getInscriptions: (cursor: number, size: number) => Promise<UnisatWalletTypes.GetInscriptionsResult>;
-	sendInscription: (address: string, inscriptionId: string, options?: {
-		feeRate: number;
-	}) => Promise<UnisatWalletTypes.SendInscriptionsResult>;
 	switchNetwork: (network: "livenet" | "testnet") => Promise<void>;
 	getNetwork: () => Promise<UnisatWalletTypes.Network>;
 	getPublicKey: () => Promise<string>;
@@ -86,26 +92,8 @@ export type Unisat = {
 	}) => Promise<string>;
 	pushPsbt: (psbtHex: string) => Promise<string>;
 	signMessage: (message: string, type?: "ecdsa" | "bip322-simple") => Promise<string>;
-	signPsbt: (psbtHex: string, options?: {
-		autoFinalized?: boolean;
-		toSignInputs: {
-			index: number;
-			address?: string;
-			publicKey?: string;
-			sighashTypes?: number[];
-			disableTweakSigner?: boolean;
-		}[];
-	}) => Promise<string>;
-	signPsbts: (psbtHexs: string[], options?: {
-		autoFinalized?: boolean;
-		toSignInputs: {
-			index: number;
-			address?: string;
-			publicKey?: string;
-			sighashTypes?: number[];
-			disableTweakSigner?: boolean;
-		};
-	}[]) => Promise<string[]>;
+	signPsbt: (psbtHex: string, options?: PsbtOption) => Promise<string>;
+	signPsbts: (psbtHexs: string[], options?: PsbtOption[]) => Promise<string[]>;
 };
 declare class UnisatConnector extends BtcConnector {
 	readonly id = "unisat";
@@ -129,7 +117,7 @@ declare class UnisatConnector extends BtcConnector {
 	getBalance(): Promise<Balance>;
 	signPsbt(psbtHex: string, options?: any): Promise<string>;
 	signMessage(message: string): Promise<string>;
-	signPsbts(psbtHexs: string[], options?: any): Promise<string[]>;
+	signPsbts(psbtHexs: string[], options?: any[]): Promise<string[]>;
 	pushTx(rawTx: string): Promise<string>;
 	pushPsbt(psbtHex: string): Promise<string>;
 }
@@ -163,10 +151,6 @@ export type NoteMarket = {
 	getAccounts: () => Promise<string[]>;
 	on: NoteMarketWalletTypes.AccountsChangedEvent;
 	removeListener: NoteMarketWalletTypes.AccountsChangedEvent;
-	getInscriptions: (cursor: number, size: number) => Promise<NoteMarketWalletTypes.GetInscriptionsResult>;
-	sendInscription: (address: string, inscriptionId: string, options?: {
-		feeRate: number;
-	}) => Promise<NoteMarketWalletTypes.SendInscriptionsResult>;
 	switchNetwork: (network: "livenet" | "testnet") => Promise<void>;
 	getNetwork: () => Promise<NoteMarketWalletTypes.Network>;
 	getPublicKey: () => Promise<string>;
@@ -179,26 +163,8 @@ export type NoteMarket = {
 	}) => Promise<string>;
 	pushPsbt: (psbtHex: string) => Promise<string>;
 	signMessage: (message: string, type?: "ecdsa" | "bip322-simple") => Promise<string>;
-	signPsbt: (psbtHex: string, options?: {
-		autoFinalized?: boolean;
-		toSignInputs: {
-			index: number;
-			address?: string;
-			publicKey?: string;
-			sighashTypes?: number[];
-			disableTweakSigner?: boolean;
-		}[];
-	}) => Promise<string>;
-	signPsbts: (psbtHexs: string[], options?: {
-		autoFinalized?: boolean;
-		toSignInputs: {
-			index: number;
-			address?: string;
-			publicKey?: string;
-			sighashTypes?: number[];
-			disableTweakSigner?: boolean;
-		};
-	}[]) => Promise<string[]>;
+	signPsbt: (psbtHex: string, options?: PsbtOption) => Promise<string>;
+	signPsbts: (psbtHexs: string[], options?: PsbtOption[]) => Promise<string[]>;
 };
 declare class NoteMarketConnector extends BtcConnector {
 	readonly id = "NOTEMarketWallet";
@@ -222,7 +188,7 @@ declare class NoteMarketConnector extends BtcConnector {
 	getBalance(): Promise<Balance>;
 	signPsbt(psbtHex: string, options?: any): Promise<string>;
 	signMessage(message: string): Promise<string>;
-	signPsbts(psbtHexs: string[], options?: any): Promise<string[]>;
+	signPsbts(psbtHexs: string[], options?: any[]): Promise<string[]>;
 	pushTx(rawTx: string): Promise<string>;
 	pushPsbt(psbtHex: string): Promise<string>;
 }
@@ -256,10 +222,6 @@ export type ChainBow = {
 	getAccounts: () => Promise<string[]>;
 	on: ChainBowWalletTypes.AccountsChangedEvent;
 	removeListener: ChainBowWalletTypes.AccountsChangedEvent;
-	getInscriptions: (cursor: number, size: number) => Promise<ChainBowWalletTypes.GetInscriptionsResult>;
-	sendInscription: (address: string, inscriptionId: string, options?: {
-		feeRate: number;
-	}) => Promise<ChainBowWalletTypes.SendInscriptionsResult>;
 	switchNetwork: (network: "BTClivenet" | "BTCtestnet") => Promise<void>;
 	getNetwork: () => Promise<ChainBowWalletTypes.Network>;
 	getPublicKey: () => Promise<string>;
@@ -272,26 +234,9 @@ export type ChainBow = {
 	}) => Promise<string>;
 	pushPsbt: (psbtHex: string) => Promise<string>;
 	signMessage: (message: string, type?: "ecdsa" | "bip322-simple") => Promise<string>;
-	signPsbt: (psbtHex: string, options?: {
-		autoFinalized?: boolean;
-		toSignInputs: {
-			index: number;
-			address?: string;
-			publicKey?: string;
-			sighashTypes?: number[];
-			disableTweakSigner?: boolean;
-		}[];
-	}) => Promise<string>;
-	signPsbts: (psbtHexs: string[], options?: {
-		autoFinalized?: boolean;
-		toSignInputs: {
-			index: number;
-			address?: string;
-			publicKey?: string;
-			sighashTypes?: number[];
-			disableTweakSigner?: boolean;
-		};
-	}[]) => Promise<string[]>;
+	signPsbt: (psbtHex: string, options?: PsbtOption) => Promise<string>;
+	finishPsbt: (psbtHex: string, options?: PsbtOption) => Promise<string>;
+	signPsbts: (psbtHexs: string[], options?: PsbtOption[]) => Promise<string[]>;
 };
 declare class ChainBowConnector extends BtcConnector {
 	readonly id = "chainbow";
@@ -315,9 +260,10 @@ declare class ChainBowConnector extends BtcConnector {
 	getBalance(): Promise<Balance>;
 	signPsbt(psbtHex: string, options?: any): Promise<string>;
 	signMessage(message: string): Promise<string>;
-	signPsbts(psbtHexs: string[], options?: any): Promise<string[]>;
+	signPsbts(psbtHexs: string[], options?: any[]): Promise<string[]>;
 	pushTx(rawTx: string): Promise<string>;
 	pushPsbt(psbtHex: string): Promise<string>;
+	finishPsbt(psbtHex: string, options?: any): Promise<string>;
 }
 export type Connector = UnisatConnector | ChainBowConnector | NoteMarketConnector;
 export interface BtcConnectors {
@@ -350,7 +296,7 @@ declare class BtcWalletConnect {
 	sendToAddress(toAddress: string, amount: number): Promise<string>;
 	signMessage(message: string, type?: MessageType): Promise<string>;
 	signPsbt(psbtHex: string, options?: any): Promise<string>;
-	signPsbts(psbtHexs: string[], options?: any): Promise<string[]>;
+	signPsbts(psbtHexs: string[], options?: any[]): Promise<string[]>;
 	pushTx(rawTx: string): Promise<string>;
 	pushPsbt(psbtHex: string): Promise<string>;
 	on(event: "networkChanged" | "accountsChanged" | "accountChanged", handler: any): void;

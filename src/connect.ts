@@ -177,7 +177,7 @@ class BtcWalletConnect {
     return this.connector.signPsbt(psbtHex, options);
   }
 
-  async signPsbts(psbtHexs: string[], options?: any) {
+  async signPsbts(psbtHexs: string[], options?: any[]) {
     if (!this.connector) {
       throw new Error('Connector not found');
     }
